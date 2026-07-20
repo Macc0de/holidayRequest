@@ -69,23 +69,16 @@
 		</footer>
 
 		<script>
-        // ============================================================
-        // 1. Инициализация Telegram Web App
-        // ============================================================
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Растягиваем приложение на весь экран
 
-        // ============================================================
-        // 2. Получение данных пользователя из Telegram
-        // ============================================================
+        // Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
         const user = tg.initDataUnsafe?.user;
         const chatId = user?.id || null;
         const firstName = user?.first_name || 'Сотрудник';
         const lastName = user?.last_name || '';
 
-        // ============================================================
-        // 3. Элементы формы
-        // ============================================================
         const startInput = document.getElementById('startDate');
         const endInput = document.getElementById('endDate');
         const daysInput = document.getElementById('daysCount');
@@ -93,36 +86,29 @@
         const submitBtn = document.getElementById('submitBtn');
         const statusMsg = document.getElementById('statusMessage');
 
-        // ============================================================
-        // 4. Настройка минимальных дат (нельзя выбрать прошлое)
-        // ============================================================
         const today = new Date().toISOString().split('T')[0];
         startInput.min = today;
         endInput.min = today;
 
-        // ============================================================
-        // 5. Ограничение: дата окончания >= дата начала
-        // ============================================================
+        // Дата окончания >= дата начала
         startInput.addEventListener('change', function() {
-            if (this.value) {
-                endInput.min = this.value;
-                if (endInput.value && endInput.value < this.value) {
-                    endInput.value = this.value;
-                }
-                calculateDays();
-            }
-        });
+		    if (this.value) {
+		        endInput.min = this.value;
+		        if (endInput.value && endInput.value < this.value) {
+		            endInput.value = this.value;
+		        }
+		        calculateDays();
+		    }
+		});
 
         endInput.addEventListener('change', function() {
-            if (this.value && startInput.value && this.value < startInput.value) {
-                this.value = startInput.value;
-            }
-            calculateDays();
-        });
+		    if (this.value && startInput.value && this.value < startInput.value) {
+		        this.value = startInput.value;
+		    }
+		    calculateDays(); 
+		});
 
-        // ============================================================
-        // 6. Автоматический подсчет количества дней
-        // ============================================================
+        // Автоматический подсчет количества дней
         function calculateDays() {
             const start = startInput.value;
             const end = endInput.value;
@@ -137,9 +123,7 @@
             }
         }
 
-        // ============================================================
-        // 7. Валидация перед отправкой
-        // ============================================================
+        // Валидация
         function validateForm() {
             const start = startInput.value;
             const end = endInput.value;
@@ -171,9 +155,7 @@
             return isValid;
         }
 
-        // ============================================================
-        // 8. Отправка данных в n8n (Webhook)
-        // ============================================================
+        // Отправка данных в n8n (Webhook)
         async function submitForm() {
             if (!validateForm()) return;
 
@@ -184,18 +166,16 @@
                 start_date: startInput.value,
                 end_date: endInput.value,
                 comment: commentInput.value || '',
-                // timestamp: new Date().toISOString() // опционально
             };
 
-            // Блокируем кнопку, показываем статус
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Отправка...';
+            submitBtn.textContent = 'Отправка';
             statusMsg.className = 'status-message';
             statusMsg.textContent = '';
 
             try {
-                // ⚠️ ЗАМЕНИ ЭТУ ССЫЛКУ НА ТВОЙ ВЕБХУК В n8n
-                const response = await fetch('https://твой-n8n-домен.com/webhook/vacation', {
+                // Ссылка на вебхук !!!
+                const response = await fetch('https://твой-n8n-домен.com/webhook/vacation', { // !!!
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -207,8 +187,8 @@
 
                 if (response.ok) {
                     statusMsg.className = 'status-message success';
-                    statusMsg.textContent = '✅ Заявка успешно отправлена!';
-                    submitBtn.textContent = '✅ Отправлено';
+                    statusMsg.textContent = 'Заявка успешно отправлена!';
+                    submitBtn.textContent = 'Отправлено';
                     
                     // Закрываем Mini App через 1.5 секунды
                     setTimeout(() => {
@@ -219,28 +199,23 @@
                 }
             } catch (error) {
                 statusMsg.className = 'status-message error';
-                statusMsg.textContent = '❌ Ошибка: ' + error.message;
+                statusMsg.textContent = 'Ошибка: ' + error.message;
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🔄 Попробовать снова';
+                submitBtn.textContent = 'Попробовать снова';
             }
         }
 
-        // ============================================================
-        // 9. Обработчик отправки формы
-        // ============================================================
+        // Обработчик отправки формы
         document.getElementById('vacationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             submitForm();
         });
 
-        // ============================================================
-        // 10. Если пользователь нажал "Назад" — закрываем приложение
-        // ============================================================
         tg.onEvent('backButtonClicked', () => {
             tg.close();
         });
 
-        console.log('✅ Mini App загружен. Пользователь:', firstName, lastName, 'Chat ID:', chatId);
+        console.log('Mini App загружен. Пользователь:', firstName, lastName, 'Chat ID:', chatId);
     </script>
 	</body>
 </html>
