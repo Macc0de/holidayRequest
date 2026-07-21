@@ -43,8 +43,8 @@
                     	</div>
 
                     	<div class="form-group">
-						    <label for="balance">Оставшиеся отпускные дни (предварительно):</label>
-						    <input type="text" id="balance" readonly value="Загрузка">
+						    <label for="balance">Останется после отпуска:</label>
+						    <input type="text" id="balance" readonly>
 						</div>
 
                     	<div class="form-group">
@@ -95,7 +95,7 @@
 
 			async function fetchBalance() {
 			    if (!chatId) {
-			        document.getElementById('balance').value = 'Неизвестно';
+			        document.getElementById('balance').value = 'Неизвестный сотрудник';
 			        return;
 			    }
 
