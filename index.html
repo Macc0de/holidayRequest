@@ -49,7 +49,7 @@
 
                     	<div class="form-group">
 		                	<label for="comment"> Комментарий (необязательно):</label>
-	                		<textarea id="comment" placeholder="Например: семейные обстоятельства"></textarea>
+	                		<textarea id="comment" placeholder="Например: тур на Бали"></textarea>
 	                	</div>
 
 	                	<button type="submit" class="btn-submit" id="submitBtn">Отправить заявку</button>
@@ -100,7 +100,16 @@
 			    }
 
 			    try {
-			        const response = await fetch(`https://aiexperiment.selecty.ru/webhook/8d7f57d2-97d9-401e-9b11-4f44bed1cb7c?chat_id=${chatId}`);
+			        const response = await fetch('https://aiexperiment.selecty.ru/webhook/8d7f57d2-97d9-401e-9b11-4f44bed1cb7c', {
+			            method: 'POST',
+			            headers: {
+			                'Content-Type': 'application/json',
+			            },
+			            body: JSON.stringify({
+			                chat_id: chatId
+			            })
+			        });
+
 			        const data = await response.json();
 			        
 			        if (data && data.balance !== undefined) {
