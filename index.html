@@ -134,8 +134,12 @@
 		    const statusMsg = document.getElementById('statusMessage');
 
 		    const today = new Date().toISOString().split('T')[0];
+		    const endOfYear = new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0];
+
 		    startInput.min = today;
+		    startInput.max = endOfYear;
 		    endInput.min = today;
+		    endInput.max = endOfYear;
 
 		    function calculateDays() {
 		        const start = startInput.value;
@@ -155,7 +159,7 @@
 		            document.getElementById('balanceAfter').value = currentBalance + ' дн.';
 		        }
 		    }
-		    
+
 		    startInput.addEventListener('input', function() {
 		        if (this.value) {
 		            endInput.min = this.value;
