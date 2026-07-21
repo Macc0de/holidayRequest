@@ -100,7 +100,7 @@
 			    }
 
 			    try {
-			        const response = await fetch(`https://aiexperiment.selecty.ru/webhook/38fdfc76-263d-4282-857f-bd45a07e0d0f`);
+			        const response = await fetch(`https://aiexperiment.selecty.ru/webhook/38fdfc76-263d-4282-857f-bd45a07e0d0f?chat_id=${chatId}`);
 			        const data = await response.json();
 			        
 			        if (data && data.balance !== undefined) {
