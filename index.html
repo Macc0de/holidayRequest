@@ -177,7 +177,7 @@
 	            submitBtn.textContent = 'Отправка';
 	            statusMsg.className = 'status-message';
 	            statusMsg.textContent = '';
-	            {{ $json.employee_id }}, {{ $json.start_date }}, {{ $json.end_date }}, {{ $json.days_used }}, {{ $json.status }}, {{ $json.comment }}
+	            
 	            try {
 	                // Ссылка на вебхук !!!
 	                const response = await fetch('https://aiexperiment.selecty.ru/webhook/5db1e332-210e-43a9-98c6-e49d2c24f6c9', { 
