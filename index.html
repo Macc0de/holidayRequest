@@ -45,6 +45,7 @@
                     	<div class="form-group">
 						    <label for="balanceAfter">Останется после отпуска:</label>
 						    <input type="text" id="balanceAfter" readonly placeholder="Будет рассчитано автоматически">
+						    <input type="hidden" id="currentBalance" value="0">
 						</div>
 
                     	<div class="form-group">
@@ -113,14 +114,17 @@
 			        const data = await response.json();
 			        
 			        if (data && data.balance !== undefined) {
-			        	currentBalance = data.balance;
-			            document.getElementById('balanceAfter').value = data.balance + ' дн.';
+			        	const balance = Number(data.balance);
+			            document.getElementById('currentBalance').value = balance;
+			            currentBalance = balance;
+
+			            document.getElementById('balanceAfter').value = balance + ' дн.';
 			        } else {
 			            document.getElementById('balanceAfter').value = 'Ошибка загрузки';
 			        }
 			    } catch (error) {
 			        console.error('Ошибка загрузки баланса:', error);
-			        document.getElementById('balanceAfter').value = 'Ошибка загрузки';
+        			document.getElementById('balanceAfter').value = 'Ошибка загрузки';
 			    }
 			}
 
@@ -141,6 +145,8 @@
 		        const start = startInput.value;
 		        const end = endInput.value;
 
+		        const balance = Number(document.getElementById('currentBalance').value) || currentBalance || 0;
+
 		        if (start && end) {
 		            const startDate = new Date(start);
 		            const endDate = new Date(end);
@@ -148,11 +154,11 @@
 		            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 		            daysInput.value = diffDays + ' дн.';
 
-		            const balanceAfter = currentBalance - diffDays;
+		            const balanceAfter = balance - diffDays;
         			document.getElementById('balanceAfter').value = balanceAfter + ' дн.';
 		        } else {
 		            daysInput.value = '';
-		            document.getElementById('balanceAfter').value = '';
+		            document.getElementById('balanceAfter').value = balance + ' дн.';
 		        }
 		    }
 
