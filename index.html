@@ -95,7 +95,7 @@
 
 			async function fetchBalance() {
 			    if (!chatId) {
-			        document.getElementById('balance').value = 'Неизвестный сотрудник';
+			        document.getElementById('balanceAfter').value = 'Неизвестно';
 			        return;
 			    }
 
@@ -113,13 +113,14 @@
 			        const data = await response.json();
 			        
 			        if (data && data.balance !== undefined) {
-			            document.getElementById('balance').value = data.balance + ' дн.';
+			        	currentBalance = data.balance;
+			            document.getElementById('balanceAfter').value = data.balance + ' дн.';
 			        } else {
-			            document.getElementById('balance').value = 'Ошибка загрузки';
+			            document.getElementById('balanceAfter').value = 'Ошибка загрузки';
 			        }
 			    } catch (error) {
 			        console.error('Ошибка загрузки баланса:', error);
-			        document.getElementById('balance').value = 'Ошибка загрузки';
+			        document.getElementById('balanceAfter').value = 'Ошибка загрузки';
 			    }
 			}
 
@@ -146,8 +147,12 @@
 		            const diffTime = Math.abs(endDate - startDate);
 		            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 		            daysInput.value = diffDays + ' дн.';
+
+		            const balanceAfter = currentBalance - diffDays;
+        			document.getElementById('balanceAfter').value = balanceAfter + ' дн.';
 		        } else {
 		            daysInput.value = '';
+		            document.getElementById('balanceAfter').value = '';
 		        }
 		    }
 
