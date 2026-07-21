@@ -73,7 +73,6 @@
 	        // Telegram Web App
 	        let tg = null;
 		    let chatId = null;
-		    let lastName = '';
 
 		    try {
 		        if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
@@ -181,7 +180,7 @@
 	            {{ $json.employee_id }}, {{ $json.start_date }}, {{ $json.end_date }}, {{ $json.days_used }}, {{ $json.status }}, {{ $json.comment }}
 	            try {
 	                // Ссылка на вебхук !!!
-	                const response = await fetch('https://aiexperiment.selecty.ru/webhook/5db1e332-210e-43a9-98c6-e49d2c24f6c9', { // !!!
+	                const response = await fetch('https://aiexperiment.selecty.ru/webhook/5db1e332-210e-43a9-98c6-e49d2c24f6c9', { 
 	                    method: 'POST',
 	                    headers: {
 	                        'Content-Type': 'application/json',
