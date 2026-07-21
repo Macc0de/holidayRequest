@@ -45,7 +45,6 @@
                     	<div class="form-group">
 						    <label for="balanceAfter">Останется после отпуска:</label>
 						    <input type="text" id="balanceAfter" readonly placeholder="Будет рассчитано автоматически">
-						    <input type="hidden" id="currentBalance" value="0">
 						</div>
 
                     	<div class="form-group">
@@ -75,10 +74,10 @@
 		</footer>
 
 		<script>
-
 	        // Telegram Web App
-	        let tg = null;
+		    let tg = null;
 		    let chatId = null;
+		    let currentBalance = 0; 
 
 		    try {
 		        if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
@@ -94,58 +93,53 @@
 		        console.warn('Ошибка инициализации Telegram WebApp:', e.message);
 		    }
 
-			async function fetchBalance() {
-			    if (!chatId) {
-			        document.getElementById('balanceAfter').value = 'Неизвестно';
-			        return;
-			    }
+		    async function fetchBalance() {
+		        if (!chatId) {
+		            document.getElementById('balanceAfter').value = 'Неизвестно';
+		            return;
+		        }
 
-			    try {
-			        const response = await fetch('https://aiexperiment.selecty.ru/webhook/8d7f57d2-97d9-401e-9b11-4f44bed1cb7c', {
-			            method: 'POST', 
-			            headers: {
-			                'Content-Type': 'application/json',
-			            },
-			            body: JSON.stringify({
-			                chat_id: chatId
-			            })
-			        });
+		        try {
+		            const response = await fetch('https://aiexperiment.selecty.ru/webhook/8d7f57d2-97d9-401e-9b11-4f44bed1cb7c', {
+		                method: 'POST',
+		                headers: {
+		                    'Content-Type': 'application/json',
+		                },
+		                body: JSON.stringify({
+		                    chat_id: chatId
+		                })
+		            });
 
-			        const data = await response.json();
-			        
-			        if (data && data.balance !== undefined) {
-			        	const balance = Number(data.balance);
-			            document.getElementById('currentBalance').value = balance;
-			            currentBalance = balance;
+		            const data = await response.json();
+		            
+		            if (data && data.balance !== undefined) {
+		                currentBalance = data.balance;  
+		                document.getElementById('balanceAfter').value = currentBalance + ' дн.';
+		            } else {
+		                document.getElementById('balanceAfter').value = 'Ошибка загрузки';
+		            }
+		        } catch (error) {
+		            console.error('Ошибка загрузки баланса:', error);
+		            document.getElementById('balanceAfter').value = 'Ошибка загрузки';
+		        }
+		    }
 
-			            document.getElementById('balanceAfter').value = balance + ' дн.';
-			        } else {
-			            document.getElementById('balanceAfter').value = 'Ошибка загрузки';
-			        }
-			    } catch (error) {
-			        console.error('Ошибка загрузки баланса:', error);
-        			document.getElementById('balanceAfter').value = 'Ошибка загрузки';
-			    }
-			}
+		    fetchBalance();
 
-			fetchBalance();
+		    const startInput = document.getElementById('startDate');
+		    const endInput = document.getElementById('endDate');
+		    const daysInput = document.getElementById('daysCount');
+		    const commentInput = document.getElementById('comment');
+		    const submitBtn = document.getElementById('submitBtn');
+		    const statusMsg = document.getElementById('statusMessage');
 
-	        const startInput = document.getElementById('startDate');
-	        const endInput = document.getElementById('endDate');
-	        const daysInput = document.getElementById('daysCount');
-	        const commentInput = document.getElementById('comment');
-	        const submitBtn = document.getElementById('submitBtn');
-	        const statusMsg = document.getElementById('statusMessage');
+		    const today = new Date().toISOString().split('T')[0];
+		    startInput.min = today;
+		    endInput.min = today;
 
-	        const today = new Date().toISOString().split('T')[0];
-	        startInput.min = today;
-	        endInput.min = today;
-
-	        function calculateDays() {
+		    function calculateDays() {
 		        const start = startInput.value;
 		        const end = endInput.value;
-
-		        const balance = Number(document.getElementById('currentBalance').value) || currentBalance || 0;
 
 		        if (start && end) {
 		            const startDate = new Date(start);
@@ -154,15 +148,15 @@
 		            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 		            daysInput.value = diffDays + ' дн.';
 
-		            const balanceAfter = balance - diffDays;
-        			document.getElementById('balanceAfter').value = balanceAfter + ' дн.';
+		            const balanceAfter = currentBalance - diffDays;
+		            document.getElementById('balanceAfter').value = balanceAfter + ' дн.';
 		        } else {
 		            daysInput.value = '';
-		            document.getElementById('balanceAfter').value = balance + ' дн.';
+		            document.getElementById('balanceAfter').value = currentBalance + ' дн.';
 		        }
 		    }
-
-	        startInput.addEventListener('input', function() {
+		    
+		    startInput.addEventListener('input', function() {
 		        if (this.value) {
 		            endInput.min = this.value;
 		            if (endInput.value && endInput.value < this.value) {
@@ -179,8 +173,8 @@
 		        calculateDays();
 		    });
 
-	        // Валидация
-	        function validateForm() {
+		    // Валидация
+		    function validateForm() {
 		        const start = startInput.value;
 		        const end = endInput.value;
 		        let isValid = true;
@@ -210,69 +204,68 @@
 		        return isValid;
 		    }
 
-	        // Отправка данных в n8n (Webhook)
-	        async function submitForm() {
-	            if (!validateForm()) return;
+		    // Отправка данных в n8n (Webhook)
+		    async function submitForm() {
+		        if (!validateForm()) return;
 
-	            const payload = {
-	                chat_id: chatId,
-	                start_date: startInput.value,
-	                end_date: endInput.value,
-	                comment: commentInput.value || ''
-	            };
+		        const payload = {
+		            chat_id: chatId,
+		            start_date: startInput.value,
+		            end_date: endInput.value,
+		            comment: commentInput.value || ''
+		        };
 
-	            submitBtn.disabled = true;
-	            submitBtn.textContent = 'Отправка';
-	            statusMsg.className = 'status-message';
-	            statusMsg.textContent = '';
-	            
-	            try {
-	                // Ссылка на вебхук !!!
-	                const response = await fetch('https://aiexperiment.selecty.ru/webhook/5db1e332-210e-43a9-98c6-e49d2c24f6c9', { 
-	                    method: 'POST',
-	                    headers: {
-	                        'Content-Type': 'application/json',
-	                    },
-	                    body: JSON.stringify(payload)
-	                });
+		        submitBtn.disabled = true;
+		        submitBtn.textContent = 'Отправка';
+		        statusMsg.className = 'status-message';
+		        statusMsg.textContent = '';
+		        
+		        try {
+		            const response = await fetch('https://aiexperiment.selecty.ru/webhook/5db1e332-210e-43a9-98c6-e49d2c24f6c9', {
+		                method: 'POST',
+		                headers: {
+		                    'Content-Type': 'application/json',
+		                },
+		                body: JSON.stringify(payload)
+		            });
 
-	                const result = await response.json();
+		            const result = await response.json();
 
-	                if (response.ok) {
-	                    statusMsg.className = 'status-message success';
-	                    statusMsg.textContent = 'Заявка успешно отправлена!';
-	                    submitBtn.textContent = 'Отправлено';
-	                    submitBtn.disabled = true;
-	                    
-	                    if (tg) {
+		            if (response.ok) {
+		                statusMsg.className = 'status-message success';
+		                statusMsg.textContent = 'Заявка успешно отправлена!';
+		                submitBtn.textContent = 'Отправлено';
+		                submitBtn.disabled = true;
+		                
+		                if (tg) {
 		                    setTimeout(() => {
 		                        tg.close();
 		                    }, 1500);
 		                }
-	                } else {
-	                    throw new Error(result.message || 'Ошибка сервера');
-	                }
-	            } catch (error) {
-	                statusMsg.className = 'status-message error';
-	                statusMsg.textContent = 'Ошибка: ' + error.message;
-	                submitBtn.disabled = false;
-	                submitBtn.textContent = 'Попробовать снова';
-	            }
-	        }
+		            } else {
+		                throw new Error(result.message || 'Ошибка сервера');
+		            }
+		        } catch (error) {
+		            statusMsg.className = 'status-message error';
+		            statusMsg.textContent = 'Ошибка: ' + error.message;
+		            submitBtn.disabled = false;
+		            submitBtn.textContent = 'Попробовать снова';
+		        }
+		    }
 
-	        // Обработчик отправки формы
-	        document.getElementById('vacationForm').addEventListener('submit', function(e) {
-	            e.preventDefault();
-	            submitForm();
-	        });
+		    // Обработчик отправки формы
+		    document.getElementById('vacationForm').addEventListener('submit', function(e) {
+		        e.preventDefault();
+		        submitForm();
+		    });
 
-	        if (tg) {
+		    if (tg) {
 		        tg.onEvent('backButtonClicked', () => {
 		            tg.close();
 		        });
 		    }
 
-        	console.log('Страница загружена', 'Chat ID:', chatId);
+		    console.log('Страница загружена', 'Chat ID:', chatId);
     	</script>
 	</body>
 </html>
