@@ -157,12 +157,7 @@
 
 		            const balanceAfter = currentBalance - diffDays;
 		            document.getElementById('balanceAfter').value = balanceAfter + ' дн.';
-
-		            if (balanceAfter < 0) {
-			            document.getElementById('balanceAfter').style.color = 'red';
-			        } else {
-			            document.getElementById('balanceAfter').style.color = 'red';
-			        }
+			        document.getElementById('balanceAfter').style.color = '';
 		        } else {
 		            daysInput.value = '';
 		            document.getElementById('balanceAfter').value = currentBalance + ' дн.';
