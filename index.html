@@ -157,18 +157,49 @@
 
 		            const balanceAfter = currentBalance - diffDays;
 		            document.getElementById('balanceAfter').value = balanceAfter + ' дн.';
+
+		            if (balanceAfter < 0) {
+			            document.getElementById('balanceAfter').style.color = 'red';
+			        } else {
+			            document.getElementById('balanceAfter').style.color = '';
+			        }
 		        } else {
 		            daysInput.value = '';
 		            document.getElementById('balanceAfter').value = currentBalance + ' дн.';
+		            document.getElementById('balanceAfter').style.color = '';
 		        }
 		    }
+
+		    function updateEndDateLimit() {
+			    const start = startInput.value;
+			    if (start && currentBalance > 0) {
+			        const startDate = new Date(start);
+			        // Максимальная дата окончания = startDate + (balance - 1) дней
+			        const maxEndDate = new Date(startDate);
+			        maxEndDate.setDate(startDate.getDate() + currentBalance - 1);
+			        
+			        // Устанавливаем max для поля endDate
+			        const maxEndDateStr = maxEndDate.toISOString().split('T')[0];
+			        endInput.max = maxEndDateStr;
+			        
+			        // Если текущая дата окончания больше новой максимальной — сбрасываем
+			        if (endInput.value && endInput.value > maxEndDateStr) {
+			            endInput.value = maxEndDateStr;
+			            calculateDays();
+			        }
+			    } else {
+			        // Если нет начальной даты или баланса — снимаем ограничение
+			        endInput.max = '';
+			    }
+			}
 
 		    startInput.addEventListener('input', function() {
 		        if (this.value) {
 		            endInput.min = this.value;
-		            if (endInput.value && endInput.value < this.value) {
-		                endInput.value = this.value;
-		            }
+		            // if (endInput.value && endInput.value < this.value) {
+		            //     endInput.value = this.value;
+		            // }
+		            updateEndDateLimit();
 		            calculateDays();
 		        }
 		    });
