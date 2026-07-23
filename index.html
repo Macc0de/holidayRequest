@@ -100,8 +100,11 @@
 		        }
 
 		        try {
-		            const response = await fetch('https://aiexperiment.selecty.ru/webhook/8d7f57d2-97d9-401e-9b11-4f44bed1cb7c?chat_id=${chatId}'
-		            );
+		            const response = await fetch('https://aiexperiment.selecty.ru/webhook/8d7f57d2-97d9-401e-9b11-4f44bed1cb7c', {
+					    method: 'POST',
+					    headers: { 'Content-Type': 'application/json' },
+					    body: JSON.stringify({ chat_id: chatId })
+					});
 
 		            const data = await response.json();
 
